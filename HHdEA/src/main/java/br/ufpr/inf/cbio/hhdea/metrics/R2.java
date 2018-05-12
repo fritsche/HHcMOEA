@@ -12,7 +12,6 @@ import org.uma.jmetal.util.naming.impl.SimpleDescribedEntity;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -149,13 +148,15 @@ public class R2<Evaluate extends List<? extends Solution<?>>>
     public double r2(Front front) {
         double[] minimumValues = {};
         double[] maximumValues = {};
-
+        
         if (this.referenceParetoFront != null) {
             // STEP 1. Obtain the maximum and minimum values of the Pareto front
             maximumValues = FrontUtils.getMaximumValues(this.referenceParetoFront);
             minimumValues = FrontUtils.getMinimumValues(this.referenceParetoFront);
 
-            front = getNormalizedFront(front, maximumValues, minimumValues);
+            // STEP 2. Get the normalized front
+            FrontNormalizer frontNormalizer = new FrontNormalizer(minimumValues, maximumValues);
+            front = frontNormalizer.normalize(front);
         }
 
         int numberOfObjectives = front.getPoint(0).getNumberOfDimensions();
@@ -177,24 +178,5 @@ public class R2<Evaluate extends List<? extends Solution<?>>>
             sum += tmp;
         }
         return sum / (double) lambda.length;
-    }
-
-    private Front getNormalizedFront(Front front, double[] maximumValues, double[] minimumValues) {
-        
-        Front normalizedFront = new ArrayFront(front);
-        int numberOfPointDimensions = front.getPoint(0).getNumberOfDimensions();
-
-        for (int i = 0; i < front.getNumberOfPoints(); i++) {
-            for (int j = 0; j < numberOfPointDimensions; j++) {
-                if ((maximumValues[j] - minimumValues[j]) == 0) {
-                    normalizedFront.getPoint(i).setDimensionValue(j, 0.0);
-                } else {
-
-                normalizedFront.getPoint(i).setDimensionValue(j, (front.getPoint(i).getDimensionValue(j)
-                        - minimumValues[j]) / (maximumValues[j] - minimumValues[j]));
-                }
-            }
-        }
-        return normalizedFront;
     }
 }
