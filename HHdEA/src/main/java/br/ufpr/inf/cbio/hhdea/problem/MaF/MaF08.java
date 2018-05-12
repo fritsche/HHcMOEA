@@ -27,6 +27,9 @@ public class MaF08 extends AbstractDoubleProblem {
         setNumberOfConstraints(0);
         this.name = "MaF08";
 
+        double r = 1;
+        const8 = polygonpoints(numberOfObjectives, r);
+
         List<Double> lower = new ArrayList<>(getNumberOfVariables()), upper = new ArrayList<>(getNumberOfVariables());
 
         for (int var = 0; var < numberOfVariables; var++) {

@@ -33,7 +33,6 @@ public class MaF09 extends AbstractDoubleProblem {
         this.name = "MaF09";
         M9 = numberOfObjectives;
 
-        //----------------------------------------------------------------------------
 //other constants during the whole process once M&D are defined
 //original polygon
         double r = 1;

@@ -23,6 +23,7 @@ public class MaF14 extends AbstractDoubleProblem {
     public MaF14(Integer numberOfVariables,
             Integer numberOfObjectives) {
 
+//evaluate sublen14,len14
         nk14 = 2;
         double[] c = new double[numberOfObjectives];
         c[0] = 3.8 * 0.1 * (1 - 0.1);
@@ -42,19 +43,23 @@ public class MaF14 extends AbstractDoubleProblem {
         }
         sublen14 = sublen;
         len14 = len;
-//re-update numberOfObjectives_,numberOfVariables_
+//re-update numberOfObjectives,numberOfVariables
         numberOfVariables = numberOfObjectives - 1 + len[numberOfObjectives];
 
         setNumberOfVariables(numberOfVariables);
         setNumberOfObjectives(numberOfObjectives);
         setNumberOfConstraints(0);
-        this.name = "MaF14";
+        name = "MaF14";
 
         List<Double> lower = new ArrayList<>(getNumberOfVariables()), upper = new ArrayList<>(getNumberOfVariables());
 
-        for (int var = 0; var < numberOfVariables; var++) {
+        for (int var = 0; var < numberOfObjectives - 1; var++) {
             lower.add(0.0);
             upper.add(1.0);
+        } //for
+        for (int var = numberOfObjectives - 1; var < numberOfVariables; var++) {
+            lower.add(0.0);
+            upper.add(10.0);
         } //for
 
         setLowerLimit(lower);
@@ -62,46 +67,41 @@ public class MaF14 extends AbstractDoubleProblem {
 
     }
 
-    /**
-     * Evaluates a solution
-     *
-     * @param solution The solution to evaluate
-     */
     @Override
     public void evaluate(DoubleSolution solution) {
 
-        int numberOfVariables_ = solution.getNumberOfVariables();
-        int numberOfObjectives_ = solution.getNumberOfObjectives();
+        int numberOfVariables = solution.getNumberOfVariables();
+        int numberOfObjectives = solution.getNumberOfObjectives();
 
-        double[] x = new double[numberOfVariables_];
-        double[] f = new double[numberOfObjectives_];
+        double[] x = new double[numberOfVariables];
+        double[] f = new double[numberOfObjectives];
 
-        for (int i = 0; i < numberOfVariables_; i++) {
+        for (int i = 0; i < numberOfVariables; i++) {
             x[i] = solution.getVariableValue(i);
         }
 
 //	change x
-        for (int i = numberOfObjectives_ - 1; i < numberOfVariables_; i++) {
-            x[i] = (1 + (i + 1) / (double) numberOfVariables_) * x[i] - 10 * x[0];
+        for (int i = numberOfObjectives - 1; i < numberOfVariables; i++) {
+            x[i] = (1 + (i + 1) / (double) numberOfVariables) * x[i] - 10 * x[0];
         }
 //	evaluate eta,g
-        double[] g = new double[numberOfObjectives_];
+        double[] g = new double[numberOfObjectives];
         double sub1;
-        for (int i = 0; i < numberOfObjectives_; i = i + 2) {
+        for (int i = 0; i < numberOfObjectives; i = i + 2) {
             double[] tx = new double[sublen14[i]];
             sub1 = 0;
             for (int j = 0; j < nk14; j++) {
-                System.arraycopy(x, len14[i] + numberOfObjectives_ - 1 + j * sublen14[i], tx, 0, sublen14[i]);
+                System.arraycopy(x, len14[i] + numberOfObjectives - 1 + j * sublen14[i], tx, 0, sublen14[i]);
                 sub1 += Rastrigin(tx);
             }
             g[i] = sub1 / (nk14 * sublen14[i]);
         }
 
-        for (int i = 1; i < numberOfObjectives_; i = i + 2) {
+        for (int i = 1; i < numberOfObjectives; i = i + 2) {
             double[] tx = new double[sublen14[i]];
             sub1 = 0;
             for (int j = 0; j < nk14; j++) {
-                System.arraycopy(x, len14[i] + numberOfObjectives_ - 1 + j * sublen14[i], tx, 0, sublen14[i]);
+                System.arraycopy(x, len14[i] + numberOfObjectives - 1 + j * sublen14[i], tx, 0, sublen14[i]);
                 sub1 += Rosenbrock(tx);
             }
             g[i] = sub1 / (nk14 * sublen14[i]);
@@ -109,14 +109,14 @@ public class MaF14 extends AbstractDoubleProblem {
 
 //	evaluate fm,fm-1,...,2,f1
         double subf1 = 1;
-        f[numberOfObjectives_ - 1] = (1 - x[0]) * (1 + g[numberOfObjectives_ - 1]);
-        for (int i = numberOfObjectives_ - 2; i > 0; i--) {
-            subf1 *= x[numberOfObjectives_ - i - 2];
-            f[i] = subf1 * (1 - x[numberOfObjectives_ - i - 1]) * (1 + g[i]);
+        f[numberOfObjectives - 1] = (1 - x[0]) * (1 + g[numberOfObjectives - 1]);
+        for (int i = numberOfObjectives - 2; i > 0; i--) {
+            subf1 *= x[numberOfObjectives - i - 2];
+            f[i] = subf1 * (1 - x[numberOfObjectives - i - 1]) * (1 + g[i]);
         }
-        f[0] = subf1 * x[numberOfObjectives_ - 2] * (1 + g[0]);
+        f[0] = subf1 * x[numberOfObjectives - 2] * (1 + g[0]);
 
-        for (int i = 0; i < numberOfObjectives_; i++) {
+        for (int i = 0; i < numberOfObjectives; i++) {
             solution.setObjective(i, f[i]);
         }
 

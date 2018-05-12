@@ -27,9 +27,13 @@ public class MaF13 extends AbstractDoubleProblem {
 
         List<Double> lower = new ArrayList<>(getNumberOfVariables()), upper = new ArrayList<>(getNumberOfVariables());
 
-        for (int var = 0; var < numberOfVariables; var++) {
+        for (int var = 0; var < 2; var++) {
             lower.add(0.0);
             upper.add(1.0);
+        } //for
+        for (int var = 2; var < numberOfVariables; var++) {
+            lower.add(-2.0);
+            upper.add(2.0);
         } //for
 
         setLowerLimit(lower);
